@@ -31,7 +31,17 @@ export default defineConfig({
     },
     cssCodeSplit: false,
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'swiper',
+        'swiper/react',
+        'swiper/modules',
+        'swiper/css',
+        'swiper/css/pagination',
+        /^swiper\//,
+      ],
       output: {
         assetFileNames: 'reusable-ui-kit.[ext]',
       },

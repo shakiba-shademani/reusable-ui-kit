@@ -20,6 +20,19 @@ export type {
   DropdownSingleProps,
 } from './components/dropdown'
 
+export { BottomNavigation } from './components/bottom-navigation'
+export type {
+  BottomNavigationItem,
+  BottomNavigationProps,
+  BottomNavigationType,
+} from './components/bottom-navigation'
+
+export { Slider } from './components/slider'
+export type { SliderItem, SliderProps } from './components/slider'
+
+export { OtpInput } from './components/otp-input'
+export type { OtpInputProps } from './components/otp-input'
+
 export { WalletIcon } from './icons/wallet-icon'
 export type { WalletIconProps } from './icons/wallet-icon'
 export { ChevronDownIcon } from './icons/chevron-down-icon'

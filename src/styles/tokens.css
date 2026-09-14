@@ -30,8 +30,15 @@
   /* Bottom sheet option row */
   --color-ruk-option: #f5f5f5;
 
+  /* Navigation / OTP accent (Pulse) */
+  --color-ruk-accent: #004693;
+  --color-ruk-accent-focus: #1d51b1;
+  --color-ruk-nav-bg: rgba(220, 220, 220, 0.29);
+  --color-ruk-otp-text: #323232;
+
   --radius-ruk: 0.5rem;
   --radius-ruk-sheet: 1rem;
+  --radius-ruk-nav: 15px;
   --spacing-ruk-field-y: 0.75rem;
   --spacing-ruk-field-x: 1rem;
 }

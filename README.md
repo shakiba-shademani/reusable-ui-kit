@@ -163,3 +163,15 @@ import { Dropdown } from 'reusable-ui-kit'
 
 `BottomSheet` is also exported for custom sheets.
 
+### BottomNavigation
+
+Frosted RTL tab bar (Pulse Figma). Supports `icon-only` / `icon-title` / `icon-active-title`, controlled `activeIndex`, and ReactNode icons.
+
+### Slider
+
+Image carousel powered by Swiper — loop, autoplay, bullets, click handlers. Peer dependency: `swiper`.
+
+### OtpInput
+
+6-box OTP by default (Figma). Normalizes Persian digits, paste/autofill, focus border `#1d51b1`, `onComplete`.
+

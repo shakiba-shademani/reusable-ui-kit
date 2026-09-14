@@ -298,6 +298,57 @@ const COMPONENTS = {
     figmaStates: ['Default', 'Error', 'Hover', 'Hover+Error', 'Disabled'],
     figmaVariants: ['Placeholder', 'Fill'],
   },
+  BottomNavigation: {
+    name: 'BottomNavigation',
+    import: `import { BottomNavigation } from 'reusable-ui-kit'`,
+    description:
+      'RTL frosted bottom tab bar. icon-only / icon-title / icon-active-title. Controlled activeIndex. Icons as ReactNode or URL.',
+    props: [
+      { name: 'items', type: 'BottomNavigationItem[]', description: 'Tabs with id, icon, title.' },
+      { name: 'activeIndex / defaultActiveIndex', type: 'number', description: 'Active tab.' },
+      { name: 'type', type: "'icon-only' | 'icon-title' | 'icon-active-title'", description: 'Label visibility.' },
+      { name: 'onChange', type: '(index, item) => void', description: 'Selection callback.' },
+    ],
+    examples: [
+      {
+        title: 'Basic',
+        code: `<BottomNavigation items={items} defaultActiveIndex={0} onChange={setIndex} />`,
+      },
+    ],
+    figmaStates: ['Active indicator'],
+    figmaVariants: ['icon-title', 'icon-only'],
+  },
+  Slider: {
+    name: 'Slider',
+    import: `import { Slider } from 'reusable-ui-kit'\nimport 'swiper/css'`,
+    description: 'Image carousel (Swiper). Loop, autoplay, bullets, click. Peer: swiper.',
+    props: [
+      { name: 'items', type: 'SliderItem[]', description: '{ image, alt?, content? }' },
+      { name: 'bulletPagination / loop / autoPlay', type: 'boolean', description: 'Carousel options.' },
+    ],
+    examples: [{ title: 'Basic', code: `<Slider items={items} bulletPagination loop />` }],
+    figmaStates: [],
+    figmaVariants: [],
+  },
+  OtpInput: {
+    name: 'OtpInput',
+    import: `import { OtpInput } from 'reusable-ui-kit'`,
+    description:
+      'OTP boxes (default 6). Persian digits normalized. Paste/autofill. Focus border #1d51b1. onChange + onComplete.',
+    props: [
+      { name: 'length', type: 'number', description: 'Defaults to 6.' },
+      { name: 'value / onChange / onComplete', type: 'string callbacks', description: 'Form-friendly.' },
+      { name: 'error', type: 'boolean', description: 'Red borders.' },
+    ],
+    examples: [
+      {
+        title: 'Basic',
+        code: `<OtpInput value={code} onChange={setCode} onComplete={submit} autoFocus />`,
+      },
+    ],
+    figmaStates: ['Default', 'Focus', 'Error'],
+    figmaVariants: ['6 digits', '4 digits'],
+  },
   WalletIcon: {
     name: 'WalletIcon',
     import: `import { WalletIcon } from 'reusable-ui-kit'`,
