@@ -30,6 +30,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "mcp": "node mcp/server.mjs",
+    "prepack": "node --input-type=module -e \"import { mkdirSync } from 'node:fs'; mkdirSync('archive', { recursive: true })\"",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
