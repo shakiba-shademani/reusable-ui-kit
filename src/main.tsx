@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+import { Button } from './components/button'
 import { Input } from './components/input'
 import { WalletIcon } from './icons/wallet-icon'
 import './styles/tokens.css'
@@ -19,6 +20,10 @@ createRoot(document.getElementById('root')!).render(
         icon={<WalletIcon width={22} height={22} />}
       />
       <Input label="عنوان" defaultValue="مانند ..." error="متن راهنما" />
+      <Button>متن</Button>
+      <Button variant="outline" icon={<WalletIcon width={24} height={24} />}>
+        متن
+      </Button>
     </main>
   </StrictMode>,
 )

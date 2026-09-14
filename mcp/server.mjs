@@ -151,6 +151,79 @@ const COMPONENTS = {
     ],
     figmaVariants: ['Default', 'Placeholder', 'Icon', 'Fill'],
   },
+  Button: {
+    name: 'Button',
+    import: `import { Button, WalletIcon } from 'reusable-ui-kit'\nimport 'reusable-ui-kit/styles.css'`,
+    description:
+      'RTL Persian button matching Figma Buttons/Mobile. Fill/Outline, Large/Med/Small widths, heights 40/48, optional icon, loading, block.',
+    props: [
+      {
+        name: 'variant',
+        type: "'filled' | 'outline'",
+        description: 'Fill (#fcb600) or outline (black border). Default filled.',
+      },
+      {
+        name: 'size',
+        type: "'large' | 'medium' | 'small'",
+        description: 'Figma widths: 330 / 200 / 161. Ignored when block.',
+      },
+      {
+        name: 'height',
+        type: '40 | 48',
+        description: 'Control height in px. Default 48.',
+      },
+      {
+        name: 'icon',
+        type: 'ReactNode',
+        description: 'Optional icon after the label (right side). Prefer WalletIcon.',
+      },
+      {
+        name: 'loading',
+        type: 'boolean',
+        description: 'Shows spinner and disables the button.',
+      },
+      {
+        name: 'block',
+        type: 'boolean',
+        description: 'Full width.',
+      },
+      {
+        name: 'forceHover',
+        type: 'boolean',
+        description: 'Storybook/demo only — paints the hover style.',
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        description: 'Disabled grey state from Figma.',
+      },
+      {
+        name: 'children',
+        type: 'ReactNode',
+        description: 'Label. Defaults to «متن».',
+      },
+    ],
+    examples: [
+      {
+        title: 'Filled',
+        code: `<Button>متن</Button>`,
+      },
+      {
+        title: 'Outline + icon',
+        code: `<Button variant="outline" icon={<WalletIcon width={24} height={24} />}>متن</Button>`,
+      },
+      {
+        title: 'Loading',
+        code: `<Button loading>در حال ثبت</Button>`,
+      },
+      {
+        title: 'Disabled',
+        code: `<Button disabled>متن</Button>`,
+      },
+    ],
+    figmaStates: ['Default', 'Hover', 'Disabled'],
+    figmaVariants: ['Fill', 'Outline', 'Large', 'Med', 'Small', 'icon'],
+  },
   WalletIcon: {
     name: 'WalletIcon',
     import: `import { WalletIcon } from 'reusable-ui-kit'`,
@@ -208,7 +281,7 @@ npm install reusable-ui-kit
 \`\`\`
 
 \`\`\`tsx
-import { Input, WalletIcon } from 'reusable-ui-kit'
+import { Input, Button, WalletIcon } from 'reusable-ui-kit'
 import 'reusable-ui-kit/styles.css'
 \`\`\`
 

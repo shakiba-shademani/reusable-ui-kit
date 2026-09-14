@@ -159,16 +159,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div
           className={clsx(
-            'group relative flex items-center rounded-ruk border transition-colors',
+            'group relative flex items-center rounded-ruk border border-solid transition-[border-color] duration-150',
             disabled
               ? 'cursor-not-allowed border-ruk-border bg-ruk-bg-disabled'
-              : clsx(
-                  'bg-ruk-bg',
-                  forceHover
-                    ? 'border-ruk-border-hover'
-                    : 'border-ruk-border hover:border-ruk-border-hover',
-                ),
-            isInvalid && !disabled && 'border-ruk-border',
+              : isInvalid
+                ? 'border-ruk-error bg-ruk-bg'
+                : clsx(
+                    'bg-ruk-bg',
+                    forceHover
+                      ? 'border-ruk-border-hover'
+                      : 'border-ruk-border hover:border-ruk-border-hover focus-within:border-ruk-border-hover',
+                  ),
           )}
         >
           {icon ? (

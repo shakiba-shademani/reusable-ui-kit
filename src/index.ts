@@ -1,6 +1,14 @@
 export { Input } from './components/input'
 export type { InputProps } from './components/input'
 
+export { Button } from './components/button'
+export type {
+  ButtonHeight,
+  ButtonProps,
+  ButtonSize,
+  ButtonVariant,
+} from './components/button'
+
 export { WalletIcon } from './icons/wallet-icon'
 export type { WalletIconProps } from './icons/wallet-icon'
 
