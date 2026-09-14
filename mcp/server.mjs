@@ -224,6 +224,80 @@ const COMPONENTS = {
     figmaStates: ['Default', 'Hover', 'Disabled'],
     figmaVariants: ['Fill', 'Outline', 'Large', 'Med', 'Small', 'icon'],
   },
+  BottomSheet: {
+    name: 'BottomSheet',
+    import: `import { BottomSheet, Button } from 'reusable-ui-kit'`,
+    description:
+      'Reusable RTL bottom sheet (portal): backdrop, slide-up panel, title, yellow divider, optional footer. Used by Dropdown.',
+    props: [
+      { name: 'open', type: 'boolean', description: 'Visibility.' },
+      { name: 'onClose', type: '() => void', description: 'Dismiss handler.' },
+      { name: 'title', type: 'string', description: 'Centered header title.' },
+      { name: 'children', type: 'ReactNode', description: 'Scrollable body.' },
+      { name: 'footer', type: 'ReactNode', description: 'Optional sticky footer.' },
+    ],
+    examples: [
+      {
+        title: 'Basic',
+        code: `<BottomSheet open={open} onClose={close} title="خدمت">...</BottomSheet>`,
+      },
+    ],
+    figmaStates: [],
+    figmaVariants: [],
+  },
+  Dropdown: {
+    name: 'Dropdown',
+    import: `import { Dropdown } from 'reusable-ui-kit'\nimport 'reusable-ui-kit/styles.css'`,
+    description:
+      'RTL dropdown field (Figma). Opens BottomSheet. Single = radio, Multiple = checkboxes. Both modes use تایید / انصراف footer (confirm disabled until a selection).',
+    props: [
+      { name: 'options', type: 'DropdownOption[]', description: '{ value, label, disabled? }[]' },
+      { name: 'multiple', type: 'boolean', description: 'Multi-select with footer actions.' },
+      { name: 'value / onChange', type: 'string | string[]', description: 'Controlled form value.' },
+      { name: 'label / placeholder / sheetTitle', type: 'string', description: 'Field + sheet copy.' },
+      { name: 'error', type: 'string', description: 'Red message + red border.' },
+      { name: 'selectAllLabel', type: 'string', description: 'Optional select-all row (multiple).' },
+      { name: 'confirmText / cancelText', type: 'string', description: 'Footer labels (multiple).' },
+    ],
+    examples: [
+      {
+        title: 'Single',
+        code: `<Dropdown
+  label="خدمت"
+  sheetTitle="خدمت"
+  options={[{ value: 'bill', label: 'قبض' }]}
+  value={value}
+  onChange={setValue}
+/>`,
+      },
+      {
+        title: 'Multiple',
+        code: `<Dropdown
+  multiple
+  label="نوع سرویس"
+  sheetTitle="نوع سرویس"
+  selectAllLabel="همه موارد"
+  options={options}
+  value={values}
+  onChange={setValues}
+  confirmText="تایید"
+  cancelText="انصراف"
+/>`,
+      },
+      {
+        title: 'react-hook-form',
+        code: `<Controller
+  name="service"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Dropdown {...field} options={options} error={fieldState.error?.message} />
+  )}
+/>`,
+      },
+    ],
+    figmaStates: ['Default', 'Error', 'Hover', 'Hover+Error', 'Disabled'],
+    figmaVariants: ['Placeholder', 'Fill'],
+  },
   WalletIcon: {
     name: 'WalletIcon',
     import: `import { WalletIcon } from 'reusable-ui-kit'`,

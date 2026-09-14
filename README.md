@@ -128,3 +128,38 @@ import { Button, WalletIcon } from 'reusable-ui-kit'
 <Button loading>در حال ثبت</Button>
 ```
 
+### Dropdown + BottomSheet
+
+`Dropdown` is the Figma field. Clicking it opens a `BottomSheet` for selection.
+
+- **Single / Multiple:** radio or checkbox rows + تایید (right) / انصراف (left) — confirm stays disabled until at least one item is selected  
+- Form-friendly: `value` / `onChange` / `error` (works with `Controller`)
+
+```tsx
+import { Dropdown } from 'reusable-ui-kit'
+
+// single
+<Dropdown
+  label="خدمت"
+  sheetTitle="خدمت"
+  options={[{ value: 'bill', label: 'قبض' }]}
+  value={value}
+  onChange={setValue}
+/>
+
+// multi
+<Dropdown
+  multiple
+  label="نوع سرویس"
+  sheetTitle="نوع سرویس"
+  selectAllLabel="همه موارد"
+  options={options}
+  value={values}
+  onChange={setValues}
+  confirmText="تایید"
+  cancelText="انصراف"
+/>
+```
+
+`BottomSheet` is also exported for custom sheets.
+
