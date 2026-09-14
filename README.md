@@ -106,3 +106,25 @@ const { register, control } = useForm()
 />
 ```
 
+### Button
+
+Matches the Figma Buttons/Mobile matrix:
+
+- **Variants:** Fill · Outline  
+- **Sizes:** Large (330) · Medium (200) · Small (161)  
+- **Heights:** 48 · 40  
+- **States:** Default · Hover · Disabled  
+- **Content:** Text · Text + icon  
+
+Also supports `loading`, `block`, `type="submit"`, and `forceHover` for Storybook.
+
+```tsx
+import { Button, WalletIcon } from 'reusable-ui-kit'
+
+<Button>متن</Button>
+<Button variant="outline" size="medium" icon={<WalletIcon />}>
+  متن
+</Button>
+<Button loading>در حال ثبت</Button>
+```
+
