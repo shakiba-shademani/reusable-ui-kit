@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "reusable-ui-kit": {
+      "command": "node",
+      "args": ["F:/pulse-pwa-sadad/cursor-ui-kit/mcp/server.mjs"]
+    }
+  }
+}
