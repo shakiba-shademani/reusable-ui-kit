@@ -38,6 +38,9 @@ export function Dropdown(props: DropdownProps) {
     confirmText = 'تایید',
     cancelText = 'انصراف',
     formatValue = defaultFormatValue,
+    variant = 'default',
+    labelMode = 'float',
+    icon,
   } = props
 
   const multiple = props.multiple === true
@@ -75,6 +78,13 @@ export function Dropdown(props: DropdownProps) {
       : formatValue(selectedOptions)
   const isInvalid = Boolean(error)
   const message = error ?? helperText
+  const isOutlined = variant === 'outlined'
+  const labelFloated =
+    isOutlined &&
+    Boolean(label) &&
+    (labelMode === 'fixed' || open || hasValue)
+  const hideStackedLabel = isOutlined
+  const hideValueWhileLabelInside = isOutlined && Boolean(label) && !labelFloated
 
   const commit = (next: string[]) => {
     if (!isControlled) {
@@ -131,10 +141,11 @@ export function Dropdown(props: DropdownProps) {
       dir={dir}
       className={clsx(
         'ruk-dropdown flex w-full max-w-[330px] flex-col gap-2',
+        isOutlined && 'pt-2',
         className,
       )}
     >
-      {label ? (
+      {label && !hideStackedLabel ? (
         <label
           htmlFor={fieldId}
           className={clsx(
@@ -162,28 +173,51 @@ export function Dropdown(props: DropdownProps) {
         aria-describedby={message ? messageId : undefined}
         onClick={openSheet}
         className={clsx(
-          'flex h-12 w-full items-center gap-2 rounded-ruk border border-solid px-2 text-sm transition-[border-color,background-color] duration-150',
+          'relative flex w-full items-center gap-2 overflow-visible rounded-ruk border border-solid text-sm transition-[border-color,background-color] duration-150',
+          isOutlined ? 'h-10 p-2' : 'h-12 px-2',
           disabled
-            ? 'cursor-not-allowed border-ruk-field-border bg-ruk-btn-disabled text-ruk-field-disabled-fg'
+            ? clsx(
+                'cursor-not-allowed border-ruk-field-border text-ruk-field-disabled-fg',
+                isOutlined ? 'bg-ruk-bg' : 'bg-ruk-btn-disabled',
+              )
             : isInvalid
-              ? 'cursor-pointer border-ruk-error bg-ruk-field text-black'
+              ? clsx(
+                  'cursor-pointer border-ruk-error text-black',
+                  isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
+                )
               : clsx(
-                  'cursor-pointer bg-ruk-field',
+                  'cursor-pointer',
+                  isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
                   forceHover
                     ? 'border-ruk-field-border-hover'
                     : 'border-ruk-field-border hover:border-ruk-field-border-hover',
                 ),
         )}
       >
+        {icon ? (
+          <span
+            className={clsx(
+              'inline-flex size-6 shrink-0 items-center justify-center',
+              disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
+            )}
+          >
+            {icon}
+          </span>
+        ) : null}
+
         <span
           className={clsx(
-            'min-w-0 flex-1 truncate text-right',
+            'min-w-0 flex-1 truncate text-right tracking-[-0.25px]',
+            hideValueWhileLabelInside && 'opacity-0',
             disabled
               ? 'text-ruk-field-disabled-fg'
               : hasValue
                 ? 'font-medium text-black'
-                : 'text-ruk-field-placeholder',
+                : isOutlined
+                  ? 'text-black'
+                  : 'text-ruk-field-placeholder',
           )}
+          aria-hidden={hideValueWhileLabelInside || undefined}
         >
           {display}
         </span>
@@ -202,6 +236,29 @@ export function Dropdown(props: DropdownProps) {
             className={clsx('transition-transform', open && 'rotate-180')}
           />
         </span>
+
+        {isOutlined && label ? (
+          <span
+            className={clsx(
+              'pointer-events-none absolute z-10 text-right whitespace-nowrap transition-[top,inset-inline-start,font-size,line-height,font-weight,padding,background-color] duration-150',
+              disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
+              labelFloated
+                ? 'start-[11px] top-0 -translate-y-1/2 bg-ruk-bg px-1 text-[8px] font-bold leading-[1.4]'
+                : clsx(
+                    'top-1/2 -translate-y-1/2 truncate text-sm font-normal leading-6',
+                    icon ? 'start-10' : 'start-2',
+                    'end-10',
+                  ),
+            )}
+          >
+            {required ? (
+              <span className="ms-1 text-ruk-error" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+            {label}
+          </span>
+        ) : null}
       </button>
 
       {/* Hidden input helps native form / RHF name registration when needed */}

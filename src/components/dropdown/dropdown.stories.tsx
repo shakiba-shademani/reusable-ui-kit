@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
+import { ReceiptIcon } from '../../icons/receipt-icon'
 import { Dropdown } from './dropdown'
 import type { DropdownOption, DropdownSingleProps } from './dropdown.types'
+
+const terminalIcon = <ReceiptIcon width={24} height={24} />
 
 const SERVICE_OPTIONS: DropdownOption[] = [
   { value: 'c2c', label: 'کارت به کارت' },
@@ -33,7 +36,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'RTL dropdown field (Figma Inputs/Mobile/Dropdown). Opens a BottomSheet for single (radio) or multiple (checkbox) selection. Form-friendly via value/onChange.',
+          'RTL dropdown field (Figma Inputs/Mobile/Dropdown). `default` stacks the label above the field. `outlined` puts the label inside (floats to the border on click) or keeps it fixed on the border. Optional `icon` sits on the right in RTL. Opens a BottomSheet for single (radio) or multiple (checkbox) selection.',
       },
     },
   },
@@ -183,6 +186,115 @@ export const FigmaMatrix: Story = {
         options={SERVICE_OPTIONS}
         defaultValue="bill"
         disabled
+      />
+    </div>
+  ),
+}
+
+export const OutlinedFloat: Story = {
+  name: 'Outlined · float',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    sheetTitle: 'پایانه',
+  },
+}
+
+export const OutlinedFloatWithIcon: Story = {
+  name: 'Outlined · float + icon',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    sheetTitle: 'پایانه',
+    icon: terminalIcon,
+  },
+}
+
+export const OutlinedFixed: Story = {
+  name: 'Outlined · fixed',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    sheetTitle: 'پایانه',
+  },
+}
+
+export const OutlinedFixedWithIcon: Story = {
+  name: 'Outlined · fixed + icon',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    sheetTitle: 'پایانه',
+    icon: terminalIcon,
+  },
+}
+
+export const OutlinedFilled: Story = {
+  name: 'Outlined · filled',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    sheetTitle: 'پایانه',
+    defaultValue: 'bill',
+    icon: terminalIcon,
+  },
+}
+
+export const OutlinedError: Story = {
+  name: 'Outlined · error',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    error: 'متن راهنما',
+    icon: terminalIcon,
+  },
+}
+
+export const OutlinedDisabled: Story = {
+  name: 'Outlined · disabled',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'پایانه',
+    placeholder: 'پایانه مورد نظر را انتخاب کنید',
+    disabled: true,
+    icon: terminalIcon,
+  },
+}
+
+export const OutlinedModes: Story = {
+  name: 'Outlined modes',
+  render: () => (
+    <div className="flex max-w-[360px] flex-col gap-8" dir="rtl">
+      <Dropdown
+        variant="outlined"
+        labelMode="float"
+        label="پایانه"
+        placeholder="پایانه مورد نظر را انتخاب کنید"
+        options={SERVICE_OPTIONS}
+        sheetTitle="پایانه"
+        icon={terminalIcon}
+      />
+      <Dropdown
+        variant="outlined"
+        labelMode="fixed"
+        label="پایانه"
+        placeholder="پایانه مورد نظر را انتخاب کنید"
+        options={SERVICE_OPTIONS}
+        sheetTitle="پایانه"
+        icon={terminalIcon}
       />
     </div>
   ),

@@ -6,8 +6,18 @@ export type DropdownOption = {
   disabled?: boolean
 }
 
+/** `default` = stacked label above the field. `outlined` = label on the field (Figma 14126:63162). */
+export type DropdownVariant = 'default' | 'outlined'
+
+/**
+ * Outlined label behavior.
+ * `float` — label starts inside and rises to the border on open or value.
+ * `fixed` — label stays on the border.
+ */
+export type DropdownLabelMode = 'float' | 'fixed'
+
 type DropdownSharedProps = {
-  /** Field label above the trigger. */
+  /** Field label. Stacked above the trigger in `default`; inside/on-border in `outlined`. */
   label?: string
   /** Placeholder when nothing is selected. */
   placeholder?: string
@@ -35,6 +45,15 @@ type DropdownSharedProps = {
   cancelText?: string
   /** How to render multiple selected values in the trigger. */
   formatValue?: (selected: DropdownOption[]) => ReactNode
+  /** Visual style. `outlined` uses the floating/border label (40px, white fill). */
+  variant?: DropdownVariant
+  /**
+   * Outlined-only. `float` (default) animates the label up on click/value;
+   * `fixed` keeps it on the border.
+   */
+  labelMode?: DropdownLabelMode
+  /** Optional leading icon (right edge in RTL). 24×24 in Figma. */
+  icon?: ReactNode
 }
 
 export type DropdownSingleProps = DropdownSharedProps & {
