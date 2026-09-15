@@ -36,6 +36,9 @@
   --color-ruk-nav-bg: rgba(220, 220, 220, 0.29);
   --color-ruk-otp-text: #323232;
 
+  /* Tab track (Figma 13390:74672) */
+  --color-ruk-tab-track: #f3f3f3;
+
   --radius-ruk: 0.5rem;
   --radius-ruk-sheet: 1rem;
   --radius-ruk-nav: 15px;

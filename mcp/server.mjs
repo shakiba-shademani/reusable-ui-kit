@@ -51,6 +51,17 @@ const COMPONENTS = {
         description: 'Muted helper copy below the input when there is no error.',
       },
       {
+        name: 'variant',
+        type: "'default' | 'outlined'",
+        description: 'Stacked label vs floating/border label.',
+      },
+      {
+        name: 'labelMode',
+        type: "'float' | 'fixed'",
+        description:
+          'Outlined only. float = label inside until focus/value; fixed = always on the border.',
+      },
+      {
         name: 'icon',
         type: 'ReactNode',
         description: 'Optional icon on the start edge (right in RTL). Prefer WalletIcon.',
@@ -68,7 +79,8 @@ const COMPONENTS = {
       {
         name: 'onlyNumber',
         type: 'boolean',
-        description: 'Digits only. Persian/Arabic digits are accepted and stored as English.',
+        description:
+          'Digits only. Persian/Arabic digits are accepted and stored as English. In RTL, numeric placeholders stay on the right.',
       },
       {
         name: 'amount',
@@ -78,7 +90,8 @@ const COMPONENTS = {
       {
         name: 'cardNo',
         type: 'boolean',
-        description: 'Formats up to 16 digits as card groups of 4.',
+        description:
+          'RTL card field: up to 16 digits, grouped every 4 (XXXX XXXX XXXX XXXX).',
       },
       {
         name: 'persianLetter',
@@ -134,6 +147,25 @@ const COMPONENTS = {
         code: `<Input label="کد" onlyNumber placeholder="۱۲۳۴" />`,
       },
       {
+        title: 'Outlined float',
+        code: `<Input
+  variant="outlined"
+  labelMode="float"
+  label="عنوان"
+  placeholder="مانند ..."
+  icon={<WalletIcon width={24} height={24} />}
+/>`,
+      },
+      {
+        title: 'Outlined fixed',
+        code: `<Input
+  variant="outlined"
+  labelMode="fixed"
+  label="عنوان"
+  placeholder="مانند ..."
+/>`,
+      },
+      {
         title: 'Error',
         code: `<Input label="عنوان" error="متن راهنما" />`,
       },
@@ -149,7 +181,7 @@ const COMPONENTS = {
       'Hover + error',
       'Disabled',
     ],
-    figmaVariants: ['Default', 'Placeholder', 'Icon', 'Fill'],
+    figmaVariants: ['Default', 'Placeholder', 'Icon', 'Fill', 'Outlined float', 'Outlined fixed'],
   },
   Button: {
     name: 'Button',
@@ -255,6 +287,9 @@ const COMPONENTS = {
       { name: 'multiple', type: 'boolean', description: 'Multi-select with footer actions.' },
       { name: 'value / onChange', type: 'string | string[]', description: 'Controlled form value.' },
       { name: 'label / placeholder / sheetTitle', type: 'string', description: 'Field + sheet copy.' },
+      { name: 'variant', type: "'default' | 'outlined'", description: 'Stacked label vs floating/border label.' },
+      { name: 'labelMode', type: "'float' | 'fixed'", description: 'Outlined only. float = label inside until click/value; fixed = always on the border.' },
+      { name: 'icon', type: 'ReactNode', description: 'Optional leading icon (right edge in RTL, 24×24).' },
       { name: 'error', type: 'string', description: 'Red message + red border.' },
       { name: 'selectAllLabel', type: 'string', description: 'Optional select-all row (multiple).' },
       { name: 'confirmText / cancelText', type: 'string', description: 'Footer labels (multiple).' },
@@ -285,6 +320,30 @@ const COMPONENTS = {
 />`,
       },
       {
+        title: 'Outlined (float + icon)',
+        code: `<Dropdown
+  variant="outlined"
+  labelMode="float"
+  label="پایانه"
+  placeholder="پایانه مورد نظر را انتخاب کنید"
+  icon={<ReceiptIcon width={24} height={24} />}
+  options={options}
+  value={value}
+  onChange={setValue}
+/>`,
+      },
+      {
+        title: 'Outlined (fixed label on border)',
+        code: `<Dropdown
+  variant="outlined"
+  labelMode="fixed"
+  label="پایانه"
+  placeholder="پایانه مورد نظر را انتخاب کنید"
+  icon={<ReceiptIcon width={24} height={24} />}
+  options={options}
+/>`,
+      },
+      {
         title: 'react-hook-form',
         code: `<Controller
   name="service"
@@ -296,7 +355,50 @@ const COMPONENTS = {
       },
     ],
     figmaStates: ['Default', 'Error', 'Hover', 'Hover+Error', 'Disabled'],
-    figmaVariants: ['Placeholder', 'Fill'],
+    figmaVariants: ['Placeholder', 'Fill', 'Outlined float', 'Outlined fixed', 'Icon'],
+  },
+  Tab: {
+    name: 'Tab',
+    import: `import { Tab } from 'reusable-ui-kit'\nimport 'reusable-ui-kit/styles.css'`,
+    description:
+      'RTL segmented tabs (Figma). Active pill is navy #004693. Controlled via value/onChange so the parent can set the active tab. Any number of items (2, 3, 4+).',
+    props: [
+      { name: 'items', type: 'TabItem[]', description: '{ value, label, disabled? }[]' },
+      { name: 'value', type: 'string', description: 'Controlled active tab. Parent can change this at any time.' },
+      { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial tab. Defaults to first item.' },
+      { name: 'onChange', type: '(value, item) => void', description: 'Fires when the user selects a tab.' },
+      { name: 'fullWidth', type: 'boolean', description: 'Stretch to container. Defaults to true.' },
+    ],
+    examples: [
+      {
+        title: 'Uncontrolled',
+        code: `<Tab
+  items={[
+    { value: 'debit', label: 'بدهکار' },
+    { value: 'credit', label: 'بستانکاری' },
+  ]}
+  defaultValue="debit"
+  onChange={setTab}
+/>`,
+      },
+      {
+        title: 'Controlled from outside',
+        code: `<Tab items={items} value={tab} onChange={setTab} />
+<button onClick={() => setTab('credit')}>فعال کن: بستانکاری</button>`,
+      },
+      {
+        title: 'Three tabs',
+        code: `<Tab
+  items={[
+    { value: 'real', label: 'حقیقی' },
+    { value: 'legal', label: 'حقوقی' },
+    { value: 'org', label: 'سازمانی' },
+  ]}
+/>`,
+      },
+    ],
+    figmaStates: ['Active', 'Inactive'],
+    figmaVariants: ['2 tabs', '3 tabs', '4 tabs'],
   },
   BottomNavigation: {
     name: 'BottomNavigation',
@@ -325,6 +427,7 @@ const COMPONENTS = {
     props: [
       { name: 'items', type: 'SliderItem[]', description: '{ image, alt?, content? }' },
       { name: 'bulletPagination / loop / autoPlay', type: 'boolean', description: 'Carousel options.' },
+      { name: 'spaceBetween', type: 'number', description: 'Gap in px between slides. Default 16.' },
     ],
     examples: [{ title: 'Basic', code: `<Slider items={items} bulletPagination loop />` }],
     figmaStates: [],
@@ -369,6 +472,31 @@ const COMPONENTS = {
       {
         title: 'Default',
         code: `<WalletIcon width={22} height={22} />`,
+      },
+    ],
+    figmaStates: [],
+    figmaVariants: [],
+  },
+  ReceiptIcon: {
+    name: 'ReceiptIcon',
+    import: `import { ReceiptIcon } from 'reusable-ui-kit'`,
+    description: 'Line POS/receipt icon used by the outlined Dropdown icon slot (24×24).',
+    props: [
+      {
+        name: 'width / height',
+        type: 'number | string',
+        description: 'Defaults to 24.',
+      },
+      {
+        name: '...svg props',
+        type: 'SVGProps<SVGSVGElement>',
+        description: 'Pass className, style, etc.',
+      },
+    ],
+    examples: [
+      {
+        title: 'Default',
+        code: `<ReceiptIcon width={24} height={24} />`,
       },
     ],
     figmaStates: [],

@@ -77,10 +77,12 @@ npm run mcp
 
 Matches the Figma matrix:
 
-- **Variants:** Default · Placeholder · Icon · Fill  
+- **Variants:** Default · Placeholder · Icon · Fill · Outlined (`float` / `fixed`)  
 - **States:** Default · Error · Hover · Hover+Error · Disabled  
 
 RTL: label, value, placeholder, and error are right-aligned; icon sits on the right.
+
+`variant="outlined"` puts the label on the field: `labelMode="float"` starts inside and rises on focus/value; `labelMode="fixed"` stays on the border.
 
 ### Behaviour
 
@@ -103,6 +105,13 @@ const { register, control } = useForm()
   render={({ field, fieldState }) => (
     <Input {...field} label="مبلغ" amount persianLetter error={fieldState.error?.message} />
   )}
+/>
+
+<Input
+  variant="outlined"
+  labelMode="float"
+  label="عنوان"
+  placeholder="مانند ..."
 />
 ```
 
@@ -133,10 +142,13 @@ import { Button, WalletIcon } from 'reusable-ui-kit'
 `Dropdown` is the Figma field. Clicking it opens a `BottomSheet` for selection.
 
 - **Single / Multiple:** radio or checkbox rows + تایید (right) / انصراف (left) — confirm stays disabled until at least one item is selected  
+- **Variants:** `default` (label above) · `outlined` (label inside or on the border)  
+- **Outlined label:** `labelMode="float"` starts inside and rises to the border on click/value; `labelMode="fixed"` stays on the border  
+- Optional `icon` (24×24, right edge in RTL)  
 - Form-friendly: `value` / `onChange` / `error` (works with `Controller`)
 
 ```tsx
-import { Dropdown } from 'reusable-ui-kit'
+import { Dropdown, ReceiptIcon } from 'reusable-ui-kit'
 
 // single
 <Dropdown
@@ -145,6 +157,26 @@ import { Dropdown } from 'reusable-ui-kit'
   options={[{ value: 'bill', label: 'قبض' }]}
   value={value}
   onChange={setValue}
+/>
+
+// outlined — label floats up on click
+<Dropdown
+  variant="outlined"
+  labelMode="float"
+  label="پایانه"
+  placeholder="پایانه مورد نظر را انتخاب کنید"
+  icon={<ReceiptIcon width={24} height={24} />}
+  options={options}
+/>
+
+// outlined — label fixed on the border
+<Dropdown
+  variant="outlined"
+  labelMode="fixed"
+  label="پایانه"
+  placeholder="پایانه مورد نظر را انتخاب کنید"
+  icon={<ReceiptIcon width={24} height={24} />}
+  options={options}
 />
 
 // multi
@@ -162,6 +194,26 @@ import { Dropdown } from 'reusable-ui-kit'
 ```
 
 `BottomSheet` is also exported for custom sheets.
+
+### Tab
+
+RTL segmented tabs ([Figma](https://www.figma.com/design/iG91bZpxdBRaEZFosjOYek/%D9%BE%D8%A7%D9%84%D8%B3?node-id=13390-74672)). Active tab is navy `#004693`. Works with 2, 3, 4+ items.
+
+**Controlled from outside** via `value` / `onChange` (the old DS `activeIndex` was only initial state).
+
+```tsx
+import { Tab } from 'reusable-ui-kit'
+
+const items = [
+  { value: 'debit', label: 'بدهکار' },
+  { value: 'credit', label: 'بستانکاری' },
+]
+
+<Tab items={items} defaultValue="debit" onChange={setTab} />
+
+<Tab items={items} value={tab} onChange={setTab} />
+<button onClick={() => setTab('credit')}>فعال کن: بستانکاری</button>
+```
 
 ### BottomNavigation
 
