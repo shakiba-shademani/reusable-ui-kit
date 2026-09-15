@@ -44,6 +44,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       activeIndex,
       onSlideChange,
       onSlideClick,
+      spaceBetween = 16,
       ...rest
     },
     ref,
@@ -92,6 +93,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       resistanceRatio: 0.85,
       speed: transitionDuration,
       initialSlide: initialIndex,
+      slidesPerView: 1,
+      spaceBetween,
       watchOverflow: true,
       allowTouchMove: hasMultiple,
       pagination:

@@ -23,4 +23,5 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
   activeIndex?: number
   onSlideChange?: (item: SliderItem, index: number) => void
   onSlideClick?: (item: SliderItem, index: number) => void
+  spaceBetween?: number
 }
