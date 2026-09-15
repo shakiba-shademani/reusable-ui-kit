@@ -1,2 +1,6 @@
 export { Input } from './input'
-export type { InputProps } from './input.types'
+export type {
+  InputLabelMode,
+  InputProps,
+  InputVariant,
+} from './input.types'

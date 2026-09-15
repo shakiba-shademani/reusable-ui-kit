@@ -1,5 +1,15 @@
 import type { InputHTMLAttributes, ReactNode } from 'react'
 
+/** `default` = stacked label above the field. `outlined` = label inside / on the border. */
+export type InputVariant = 'default' | 'outlined'
+
+/**
+ * Outlined label behavior.
+ * `float` — label starts inside and rises to the border on focus or value.
+ * `fixed` — label stays on the border.
+ */
+export type InputLabelMode = 'float' | 'fixed'
+
 export type InputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size' | 'value' | 'defaultValue'
@@ -8,8 +18,15 @@ export type InputProps = Omit<
   value?: string | number
   /** Uncontrolled initial value. */
   defaultValue?: string | number
-  /** Field label — rendered above the control (right-aligned in RTL). */
+  /** Field label. Stacked above in `default`; inside/on-border in `outlined`. */
   label?: string
+  /** Visual style. `outlined` uses the floating/border label. */
+  variant?: InputVariant
+  /**
+   * Outlined-only. `float` (default) animates the label up on focus/value;
+   * `fixed` keeps it on the border.
+   */
+  labelMode?: InputLabelMode
   /** Error message shown below the input (takes priority over `helperText`). */
   error?: string
   /** Helper copy below the input when there is no `error`. */

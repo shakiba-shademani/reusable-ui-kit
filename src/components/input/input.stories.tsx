@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'RTL Persian text field matching the Figma matrix: Default / Placeholder / Icon / Fill × Default / Error / Hover / Hover+Error / Disabled.',
+          'RTL Persian text field matching the Figma matrix: Default / Placeholder / Icon / Fill × Default / Error / Hover / Hover+Error / Disabled. `outlined` puts the label inside (`float` rises on focus/value) or fixed on the border.',
       },
     },
   },
@@ -219,8 +219,9 @@ export const AmountWithPersianLetter: Story = {
 export const CardNumber: Story = {
   args: {
     label: 'شماره کارت',
-    placeholder: 'شماره کارت را وارد کنید',
+    placeholder: '۶۰۳۷ ۹۹۱۸ ۱۲۳۴ ۵۶۷۸',
     cardNo: true,
+    defaultValue: '6037991812345678',
   },
 }
 
@@ -288,4 +289,106 @@ export const FigmaMatrix: Story = {
       </div>
     )
   },
+}
+
+const outlinedIcon = <WalletIcon width={24} height={24} />
+
+export const OutlinedFloat: Story = {
+  name: 'Outlined · float',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+  },
+}
+
+export const OutlinedFloatWithIcon: Story = {
+  name: 'Outlined · float + icon',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+    icon: outlinedIcon,
+  },
+}
+
+export const OutlinedFixed: Story = {
+  name: 'Outlined · fixed',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+  },
+}
+
+export const OutlinedFixedWithIcon: Story = {
+  name: 'Outlined · fixed + icon',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+    icon: outlinedIcon,
+  },
+}
+
+export const OutlinedFilled: Story = {
+  name: 'Outlined · filled',
+  args: {
+    variant: 'outlined',
+    labelMode: 'float',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+    defaultValue: 'متن نمونه',
+    icon: outlinedIcon,
+  },
+}
+
+export const OutlinedError: Story = {
+  name: 'Outlined · error',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+    error: 'متن راهنما',
+    icon: outlinedIcon,
+  },
+}
+
+export const OutlinedDisabled: Story = {
+  name: 'Outlined · disabled',
+  args: {
+    variant: 'outlined',
+    labelMode: 'fixed',
+    label: 'عنوان',
+    placeholder: 'مانند ...',
+    disabled: true,
+    icon: outlinedIcon,
+  },
+}
+
+export const OutlinedModes: Story = {
+  name: 'Outlined modes',
+  render: () => (
+    <div className="flex max-w-[320px] flex-col gap-8" dir="rtl">
+      <Input
+        variant="outlined"
+        labelMode="float"
+        label="عنوان"
+        placeholder="مانند ..."
+        icon={outlinedIcon}
+      />
+      <Input
+        variant="outlined"
+        labelMode="fixed"
+        label="عنوان"
+        placeholder="مانند ..."
+        icon={outlinedIcon}
+      />
+    </div>
+  ),
 }

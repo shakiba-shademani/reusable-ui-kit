@@ -5,11 +5,23 @@ import {
   useState,
   type ChangeEvent,
   type ClipboardEvent,
+  type FocusEvent,
 } from 'react'
 
-import { digitsOnly, formatInputValue } from '../../utils/format-input-value'
+import { digitsOnly, formatInputValue, stripBidiMarks } from '../../utils/format-input-value'
 import { toPersianLetter } from '../../utils/to-persian-letter'
 import type { InputProps } from './input.types'
+
+const RLM = '\u200F'
+const LRI = '\u2066'
+const PDI = '\u2069'
+
+/** Keep numeric values/placeholders sitting on the right in RTL. */
+function toRtlVisual(value: string, isolateLtr: boolean) {
+  if (!value) return value
+  const body = isolateLtr ? `${LRI}${value}${PDI}` : value
+  return `${RLM}${body}`
+}
 
 function buildChangeEvent(
   event: ChangeEvent<HTMLInputElement>,
@@ -48,7 +60,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       defaultValue,
       onChange,
       onPaste,
+      onFocus,
+      onBlur,
       inputMode,
+      placeholder,
+      variant = 'default',
+      labelMode = 'float',
       ...rest
     },
     ref,
@@ -71,6 +88,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const [uncontrolledValue, setUncontrolledValue] = useState(() =>
       formatInputValue(defaultValue, formatOptions),
     )
+    const [focused, setFocused] = useState(false)
 
     const displayValue = isControlled
       ? formatInputValue(value, formatOptions)
@@ -78,6 +96,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const message = error ?? helperText
     const isInvalid = Boolean(error)
+    const hasValue = String(displayValue ?? '').length > 0
+    const isOutlined = variant === 'outlined'
+    const labelFloated =
+      isOutlined &&
+      Boolean(label) &&
+      (labelMode === 'fixed' || focused || hasValue)
+    const hideStackedLabel = isOutlined
+    const hidePlaceholderWhileLabelInside =
+      isOutlined && Boolean(label) && !labelFloated
+    const numericField = onlyNumber || amount || cardNo
+    const rtlNumeric = dir === 'rtl' && numericField
+    const visualValue = rtlNumeric
+      ? toRtlVisual(displayValue, cardNo)
+      : displayValue
+    const visualPlaceholder =
+      hidePlaceholderWhileLabelInside || !placeholder
+        ? undefined
+        : rtlNumeric
+          ? toRtlVisual(placeholder, cardNo)
+          : placeholder
 
     const amountInWords = (() => {
       if (!amount || !persianLetter) return ''
@@ -105,14 +143,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      commitValue(formatInputValue(event.target.value, formatOptions), event)
+      commitValue(
+        formatInputValue(stripBidiMarks(event.target.value), formatOptions),
+        event,
+      )
     }
 
     const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
       event.preventDefault()
 
       let nextValue = formatInputValue(
-        event.clipboardData.getData('text'),
+        stripBidiMarks(event.clipboardData.getData('text')),
         formatOptions,
       )
 
@@ -132,15 +173,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onPaste?.(event)
     }
 
+    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+      setFocused(true)
+      onFocus?.(event)
+    }
+
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+      setFocused(false)
+      onBlur?.(event)
+    }
+
     return (
       <div
         dir={dir}
         className={clsx(
           'ruk-input flex w-full max-w-[320px] flex-col gap-2',
+          isOutlined && 'pt-2',
           className,
         )}
       >
-        {label ? (
+        {label && !hideStackedLabel ? (
           <label
             htmlFor={inputId}
             className={clsx(
@@ -159,16 +211,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div
           className={clsx(
-            'group relative flex items-center rounded-ruk border border-solid transition-[border-color] duration-150',
+            'group relative flex items-center overflow-visible rounded-ruk border border-solid transition-[border-color] duration-150',
+            isOutlined && 'h-10',
             disabled
-              ? 'cursor-not-allowed border-ruk-border bg-ruk-bg-disabled'
+              ? isOutlined
+                ? 'cursor-not-allowed border-ruk-field-border bg-ruk-bg'
+                : 'cursor-not-allowed border-ruk-border bg-ruk-bg-disabled'
               : isInvalid
                 ? 'border-ruk-error bg-ruk-bg'
                 : clsx(
                     'bg-ruk-bg',
                     forceHover
-                      ? 'border-ruk-border-hover'
-                      : 'border-ruk-border hover:border-ruk-border-hover focus-within:border-ruk-border-hover',
+                      ? isOutlined
+                        ? 'border-ruk-field-border-hover'
+                        : 'border-ruk-border-hover'
+                      : isOutlined
+                        ? 'border-ruk-field-border hover:border-ruk-field-border-hover focus-within:border-ruk-field-border-hover'
+                        : 'border-ruk-border hover:border-ruk-border-hover focus-within:border-ruk-border-hover',
                   ),
           )}
         >
@@ -176,8 +235,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <span
               className={clsx(
                 // `start` = right edge in RTL — matches Figma icon placement
-                'pointer-events-none absolute start-3 top-1/2 flex -translate-y-1/2 items-center justify-center',
-                disabled ? 'text-ruk-text-disabled' : 'text-ruk-icon',
+                'pointer-events-none absolute start-3 top-1/2 z-10 flex size-6 -translate-y-1/2 items-center justify-center',
+                disabled
+                  ? isOutlined
+                    ? 'text-ruk-field-disabled-fg'
+                    : 'text-ruk-text-disabled'
+                  : isOutlined
+                    ? 'text-black'
+                    : 'text-ruk-icon',
               )}
             >
               {icon}
@@ -193,23 +258,57 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={isInvalid || undefined}
             aria-describedby={describedBy}
             dir={dir}
+            placeholder={visualPlaceholder}
             inputMode={
-              inputMode ??
-              (onlyNumber || amount || cardNo ? 'numeric' : undefined)
+              inputMode ?? (numericField ? 'numeric' : undefined)
             }
             className={clsx(
-              'w-full rounded-ruk border-0 bg-transparent text-right text-base leading-6 outline-none',
-              'px-(--spacing-ruk-field-x) py-(--spacing-ruk-field-y)',
+              'w-full rounded-ruk border-0 bg-transparent text-right outline-none',
+              rtlNumeric && '[unicode-bidi:isolate] placeholder:text-right',
+              isOutlined
+                ? 'h-full px-2 text-sm leading-6 tracking-[-0.25px]'
+                : clsx(
+                    'text-base leading-6',
+                    'px-(--spacing-ruk-field-x) py-(--spacing-ruk-field-y)',
+                  ),
               'placeholder:text-ruk-text-muted',
               disabled
-                ? 'cursor-not-allowed text-ruk-text-disabled placeholder:text-ruk-text-disabled'
+                ? isOutlined
+                  ? 'cursor-not-allowed text-ruk-field-disabled-fg placeholder:text-ruk-field-disabled-fg'
+                  : 'cursor-not-allowed text-ruk-text-disabled placeholder:text-ruk-text-disabled'
                 : 'text-ruk-text',
-              icon && 'ps-11',
+              icon && (isOutlined ? 'ps-10' : 'ps-11'),
             )}
-            value={displayValue}
+            value={visualValue}
             onChange={handleChange}
             onPaste={handlePaste}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
           />
+
+          {isOutlined && label ? (
+            <label
+              htmlFor={inputId}
+              className={clsx(
+                'pointer-events-none absolute z-10 m-0 text-right whitespace-nowrap transition-[top,inset-inline-start,font-size,line-height,font-weight,padding,background-color] duration-150',
+                disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
+                labelFloated
+                  ? 'start-[11px] top-0 -translate-y-1/2 bg-ruk-bg px-1 text-[8px] font-bold leading-[1.4]'
+                  : clsx(
+                      'top-1/2 -translate-y-1/2 truncate text-sm font-normal leading-6',
+                      icon ? 'start-10' : 'start-2',
+                      'end-2',
+                    ),
+              )}
+            >
+              {required ? (
+                <span className="ms-1 text-ruk-error" aria-hidden="true">
+                  *
+                </span>
+              ) : null}
+              {label}
+            </label>
+          ) : null}
         </div>
 
         {amountInWords ? (
