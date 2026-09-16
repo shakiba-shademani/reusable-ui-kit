@@ -217,12 +217,12 @@ export const Dropdown = forwardRef<HTMLInputElement, DropdownProps>(
               disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
             )}
           >
+            {label}
             {required ? (
               <span className="ms-1 text-ruk-error" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {label}
           </label>
         ) : null}
 
@@ -314,12 +314,12 @@ export const Dropdown = forwardRef<HTMLInputElement, DropdownProps>(
                     ),
               )}
             >
+              {label}
               {required ? (
                 <span className="ms-1 text-ruk-error" aria-hidden="true">
                   *
                 </span>
               ) : null}
-              {label}
             </span>
           ) : null}
         </button>
