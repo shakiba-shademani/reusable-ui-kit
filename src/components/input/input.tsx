@@ -1,16 +1,26 @@
 import { clsx } from 'clsx'
 import {
   forwardRef,
+  useCallback,
   useId,
+  useMemo,
   useState,
   type ChangeEvent,
   type ClipboardEvent,
+  type CSSProperties,
   type FocusEvent,
+  type Ref,
 } from 'react'
 
 import { digitsOnly, formatInputValue, stripBidiMarks } from '../../utils/format-input-value'
 import { toPersianLetter } from '../../utils/to-persian-letter'
-import type { InputProps } from './input.types'
+import type { InputProps, InputTextAlign } from './input.types'
+
+const TEXT_ALIGN_CLASS: Record<InputTextAlign, string> = {
+  left: 'text-left placeholder:text-left',
+  center: 'text-center placeholder:text-center',
+  right: 'text-right placeholder:text-right',
+}
 
 const RLM = '\u200F'
 const LRI = '\u2066'
@@ -37,6 +47,23 @@ function buildChangeEvent(
   }
 }
 
+function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
+  return (node: T | null) => {
+    for (const ref of refs) {
+      if (!ref) continue
+      if (typeof ref === 'function') {
+        ref(node)
+      } else {
+        ref.current = node
+      }
+    }
+  }
+}
+
+function toCssWidth(width: string | number) {
+  return typeof width === 'number' ? `${width}px` : width
+}
+
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   function Input(
     {
@@ -55,7 +82,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       required,
       className,
       id,
+      name,
       dir = 'rtl',
+      width,
+      register,
+      registerOptions,
       value,
       defaultValue,
       onChange,
@@ -66,6 +97,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       placeholder,
       variant = 'default',
       labelMode = 'float',
+      textAlign = 'right',
       ...rest
     },
     ref,
@@ -75,13 +107,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const messageId = `${inputId}-message`
     const amountWordsId = `${inputId}-amount-words`
 
-    const formatOptions = {
-      onlyNumber: onlyNumber || amount || cardNo,
-      amount,
-      cardNo,
-      cardNoSeparator,
-      separator,
+    const { ref: restRef, ...inputRest } = rest as typeof rest & {
+      ref?: Ref<HTMLInputElement>
     }
+
+    const formatOptions = useMemo(
+      () => ({
+        onlyNumber: onlyNumber || amount || cardNo,
+        amount,
+        cardNo,
+        cardNoSeparator,
+        separator,
+      }),
+      [onlyNumber, amount, cardNo, cardNoSeparator, separator],
+    )
 
     const isControlled = value !== undefined
 
@@ -121,7 +160,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       if (!amount || !persianLetter) return ''
       const raw = digitsOnly(displayValue)
       if (!raw) return ''
-      // Previous DS treated the numeric value as Rials and showed Tomans (÷ 10).
       const toman = Math.floor(Number(raw) / 10)
       const words = toPersianLetter(toman)
       return words ? `${words} تومان` : ''
@@ -132,22 +170,35 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         .filter(Boolean)
         .join(' ') || undefined
 
-    const commitValue = (
-      nextValue: string,
-      event: ChangeEvent<HTMLInputElement>,
-    ) => {
-      if (!isControlled) {
-        setUncontrolledValue(nextValue)
-      }
-      onChange?.(buildChangeEvent(event, nextValue))
-    }
+    const commitValue = useCallback(
+      (nextValue: string, event: ChangeEvent<HTMLInputElement>) => {
+        if (!isControlled) {
+          setUncontrolledValue(nextValue)
+        }
+        onChange?.(buildChangeEvent(event, nextValue))
+      },
+      [isControlled, onChange],
+    )
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      commitValue(
-        formatInputValue(stripBidiMarks(event.target.value), formatOptions),
-        event,
-      )
-    }
+    const handleChange = useCallback(
+      (event: ChangeEvent<HTMLInputElement>) => {
+        commitValue(
+          formatInputValue(stripBidiMarks(event.target.value), formatOptions),
+          event,
+        )
+      },
+      [commitValue, formatOptions],
+    )
+
+    const registerBinding = useMemo(() => {
+      if (!register || !name) return null
+      return register(name, {
+        onChange: handleChange,
+        ...(registerOptions ?? {}),
+      })
+    }, [register, name, registerOptions, handleChange])
+
+    const inputChangeHandler = registerBinding?.onChange ?? handleChange
 
     const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
       event.preventDefault()
@@ -157,7 +208,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         formatOptions,
       )
 
-      // Match previous DS: a pasted amount of "0" clears the field.
       if (amount && nextValue === '0') {
         nextValue = ''
       }
@@ -169,7 +219,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         currentTarget: target,
       } as unknown as ChangeEvent<HTMLInputElement>
 
-      commitValue(nextValue, syntheticChange)
+      inputChangeHandler(buildChangeEvent(syntheticChange, nextValue))
       onPaste?.(event)
     }
 
@@ -180,14 +230,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
       setFocused(false)
+      registerBinding?.onBlur?.(event)
       onBlur?.(event)
     }
+
+    const wrapperStyle: CSSProperties | undefined =
+      width !== undefined ? { width: toCssWidth(width) } : undefined
 
     return (
       <div
         dir={dir}
+        style={wrapperStyle}
         className={clsx(
-          'ruk-input flex w-full max-w-[320px] flex-col gap-2',
+          'ruk-input flex w-full flex-col gap-2',
+          width === undefined && 'max-w-[320px]',
+          width !== undefined && 'max-w-none',
           isOutlined && 'pt-2',
           className,
         )}
@@ -200,12 +257,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               disabled ? 'text-ruk-text-disabled' : 'text-ruk-text',
             )}
           >
+            {label}
             {required ? (
               <span className="ms-1 text-ruk-error" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {label}
           </label>
         ) : null}
 
@@ -234,7 +291,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {icon ? (
             <span
               className={clsx(
-                // `start` = right edge in RTL — matches Figma icon placement
                 'pointer-events-none absolute start-3 top-1/2 z-10 flex size-6 -translate-y-1/2 items-center justify-center',
                 disabled
                   ? isOutlined
@@ -250,9 +306,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ) : null}
 
           <input
-            {...rest}
-            ref={ref}
+            {...inputRest}
+            {...registerBinding}
+            ref={mergeRefs(ref, restRef, registerBinding?.ref)}
             id={inputId}
+            name={registerBinding?.name ?? name}
             disabled={disabled}
             required={required}
             aria-invalid={isInvalid || undefined}
@@ -263,8 +321,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               inputMode ?? (numericField ? 'numeric' : undefined)
             }
             className={clsx(
-              'w-full rounded-ruk border-0 bg-transparent text-right outline-none',
-              rtlNumeric && '[unicode-bidi:isolate] placeholder:text-right',
+              'w-full rounded-ruk border-0 bg-transparent outline-none',
+              TEXT_ALIGN_CLASS[textAlign],
+              rtlNumeric && '[unicode-bidi:isolate]',
               isOutlined
                 ? 'h-full px-2 text-sm leading-6 tracking-[-0.25px]'
                 : clsx(
@@ -280,7 +339,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               icon && (isOutlined ? 'ps-10' : 'ps-11'),
             )}
             value={visualValue}
-            onChange={handleChange}
+            onChange={inputChangeHandler}
             onPaste={handlePaste}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -301,12 +360,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     ),
               )}
             >
+              {label}
               {required ? (
                 <span className="ms-1 text-ruk-error" aria-hidden="true">
                   *
                 </span>
               ) : null}
-              {label}
             </label>
           ) : null}
         </div>
@@ -320,18 +379,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </p>
         ) : null}
 
-        {message ? (
-          <p
-            id={messageId}
-            role={isInvalid ? 'alert' : undefined}
-            className={clsx(
-              'm-0 text-right text-sm font-normal leading-5',
-              isInvalid ? 'text-ruk-error' : 'text-ruk-text-muted',
-            )}
-          >
-            {message}
-          </p>
-        ) : null}
+        <p
+          id={messageId}
+          role={isInvalid ? 'alert' : undefined}
+          className={clsx(
+            'm-0 min-h-5 text-right text-sm font-normal leading-5',
+            message
+              ? isInvalid
+                ? 'text-ruk-error'
+                : 'text-ruk-text-muted'
+              : 'invisible',
+          )}
+        >
+          {message || '\u00A0'}
+        </p>
       </div>
     )
   },

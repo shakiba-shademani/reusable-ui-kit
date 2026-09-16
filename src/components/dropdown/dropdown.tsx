@@ -1,5 +1,12 @@
 import { clsx } from 'clsx'
-import { useId, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type Ref,
+} from 'react'
 
 import { Button } from '../button'
 import { BottomSheet } from '../bottom-sheet'
@@ -19,339 +26,402 @@ function defaultFormatValue(selected: DropdownOption[]): string {
   return selected.map((item) => item.label).join('، ')
 }
 
-export function Dropdown(props: DropdownProps) {
-  const {
-    label,
-    placeholder = 'مانند ...',
-    options,
-    sheetTitle,
-    error,
-    helperText,
-    disabled = false,
-    required = false,
-    className,
-    id,
-    name,
-    dir = 'rtl',
-    forceHover = false,
-    selectAllLabel,
-    confirmText = 'تایید',
-    cancelText = 'انصراف',
-    formatValue = defaultFormatValue,
-    variant = 'default',
-    labelMode = 'float',
-    icon,
-  } = props
-
-  const multiple = props.multiple === true
-  const isControlled = props.value !== undefined
-
-  const autoId = useId()
-  const fieldId = id ?? autoId
-  const messageId = `${fieldId}-message`
-
-  const [open, setOpen] = useState(false)
-  const [uncontrolled, setUncontrolled] = useState<string[]>(() =>
-    toArray(props.defaultValue as string | string[] | undefined),
-  )
-  const [draft, setDraft] = useState<string[]>([])
-
-  const selected = isControlled
-    ? toArray(props.value as string | string[] | undefined)
-    : uncontrolled
-
-  const selectedOptions = options.filter((option) =>
-    selected.includes(option.value),
-  )
-  const optionValues = options
-    .filter((option) => !option.disabled)
-    .map((option) => option.value)
-  const allOptionsSelected =
-    multiple &&
-    optionValues.length > 0 &&
-    optionValues.every((value) => selected.includes(value))
-  const hasValue = selectedOptions.length > 0
-  const display = !hasValue
-    ? placeholder
-    : allOptionsSelected && selectAllLabel
-      ? selectAllLabel
-      : formatValue(selectedOptions)
-  const isInvalid = Boolean(error)
-  const message = error ?? helperText
-  const isOutlined = variant === 'outlined'
-  const labelFloated =
-    isOutlined &&
-    Boolean(label) &&
-    (labelMode === 'fixed' || open || hasValue)
-  const hideStackedLabel = isOutlined
-  const hideValueWhileLabelInside = isOutlined && Boolean(label) && !labelFloated
-
-  const commit = (next: string[]) => {
-    if (!isControlled) {
-      setUncontrolled(next)
-    }
-
-    if (multiple) {
-      ;(props.onChange as ((value: string[]) => void) | undefined)?.(next)
-    } else {
-      ;(props.onChange as ((value: string) => void) | undefined)?.(next[0] ?? '')
+function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
+  return (node: T | null) => {
+    for (const ref of refs) {
+      if (!ref) continue
+      if (typeof ref === 'function') {
+        ref(node)
+      } else {
+        ref.current = node
+      }
     }
   }
+}
 
-  const openSheet = () => {
-    if (disabled) return
-    setDraft(selected)
-    setOpen(true)
-  }
+export const Dropdown = forwardRef<HTMLInputElement, DropdownProps>(
+  function Dropdown(props, ref) {
+    const {
+      label,
+      placeholder = 'مانند ...',
+      options,
+      sheetTitle,
+      error,
+      helperText,
+      disabled = false,
+      required = false,
+      className,
+      id,
+      name,
+      dir = 'rtl',
+      forceHover = false,
+      selectAllLabel,
+      confirmText = 'تایید',
+      cancelText = 'انصراف',
+      formatValue = defaultFormatValue,
+      variant = 'default',
+      labelMode = 'float',
+      icon,
+      register,
+      onBlur,
+    } = props
 
-  const closeSheet = () => setOpen(false)
+    const multiple = props.multiple === true
+    const isControlled = props.value !== undefined
 
-  const toggleMulti = (value: string) => {
-    setDraft((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value],
+    const autoId = useId()
+    const fieldId = id ?? autoId
+    const messageId = `${fieldId}-message`
+    const didSyncRegister = useRef(false)
+
+    const [open, setOpen] = useState(false)
+    const [uncontrolled, setUncontrolled] = useState<string[]>(() =>
+      toArray(props.defaultValue as string | string[] | undefined),
     )
-  }
+    const [draft, setDraft] = useState<string[]>([])
 
-  const toggleSelectAll = () => {
+    const selected = isControlled
+      ? toArray(props.value as string | string[] | undefined)
+      : uncontrolled
+
+    const selectedOptions = options.filter((option) =>
+      selected.includes(option.value),
+    )
+    const optionValues = options
+      .filter((option) => !option.disabled)
+      .map((option) => option.value)
+    const allOptionsSelected =
+      multiple &&
+      optionValues.length > 0 &&
+      optionValues.every((value) => selected.includes(value))
+    const hasValue = selectedOptions.length > 0
+    const display = !hasValue
+      ? placeholder
+      : allOptionsSelected && selectAllLabel
+        ? selectAllLabel
+        : formatValue(selectedOptions)
+    const isInvalid = Boolean(error)
+    const message = error ?? helperText
+    const isOutlined = variant === 'outlined'
+    const labelFloated =
+      isOutlined &&
+      Boolean(label) &&
+      (labelMode === 'fixed' || open || hasValue)
+    const hideStackedLabel = isOutlined
+    const hideValueWhileLabelInside =
+      isOutlined && Boolean(label) && !labelFloated
+
+    const registerBinding =
+      register && name ? register(name) : null
+
+    const notifyRegister = (next: string[]) => {
+      if (!registerBinding || !name) return
+      registerBinding.onChange({
+        target: {
+          name,
+          value: multiple ? next : (next[0] ?? ''),
+        },
+      })
+    }
+
+    const notifyBlur = () => {
+      if (registerBinding && name) {
+        registerBinding.onBlur({ target: { name } })
+      }
+      onBlur?.()
+    }
+
+    // Sync initial / default value into RHF once (matches previous Select DS).
+    useEffect(() => {
+      if (!registerBinding || !name || didSyncRegister.current) return
+      didSyncRegister.current = true
+      notifyRegister(selected)
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- mount sync only
+    }, [])
+
+    const commit = (next: string[]) => {
+      if (!isControlled) {
+        setUncontrolled(next)
+      }
+
+      if (multiple) {
+        ;(props.onChange as ((value: string[]) => void) | undefined)?.(next)
+      } else {
+        ;(props.onChange as ((value: string) => void) | undefined)?.(
+          next[0] ?? '',
+        )
+      }
+
+      notifyRegister(next)
+    }
+
+    const openSheet = () => {
+      if (disabled) return
+      setDraft(selected)
+      setOpen(true)
+    }
+
+    const closeSheet = () => {
+      setOpen(false)
+      notifyBlur()
+    }
+
+    const toggleMulti = (value: string) => {
+      setDraft((prev) =>
+        prev.includes(value)
+          ? prev.filter((item) => item !== value)
+          : [...prev, value],
+      )
+    }
+
+    const toggleSelectAll = () => {
+      const allSelected =
+        optionValues.length > 0 &&
+        optionValues.every((value) => draft.includes(value))
+      setDraft(allSelected ? [] : optionValues)
+    }
+
+    const selectSingle = (value: string) => {
+      setDraft([value])
+    }
+
+    const confirmSelection = () => {
+      if (draft.length === 0) return
+      commit(draft)
+      closeSheet()
+    }
+
+    const isDraftSelected = (value: string) => draft.includes(value)
     const allSelected =
       optionValues.length > 0 &&
       optionValues.every((value) => draft.includes(value))
-    setDraft(allSelected ? [] : optionValues)
-  }
 
-  const selectSingle = (value: string) => {
-    setDraft([value])
-  }
+    const hiddenValue = multiple
+      ? selected.join(',')
+      : (selected[0] ?? '')
 
-  const confirmSelection = () => {
-    if (draft.length === 0) return
-    commit(draft)
-    closeSheet()
-  }
-
-  const isDraftSelected = (value: string) => draft.includes(value)
-  const allSelected =
-    optionValues.length > 0 &&
-    optionValues.every((value) => draft.includes(value))
-
-  return (
-    <div
-      dir={dir}
-      className={clsx(
-        'ruk-dropdown flex w-full max-w-[330px] flex-col gap-2',
-        isOutlined && 'pt-2',
-        className,
-      )}
-    >
-      {label && !hideStackedLabel ? (
-        <label
-          htmlFor={fieldId}
-          className={clsx(
-            'm-0 text-right text-sm font-bold leading-5',
-            disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
-          )}
-        >
-          {required ? (
-            <span className="ms-1 text-ruk-error" aria-hidden="true">
-              *
-            </span>
-          ) : null}
-          {label}
-        </label>
-      ) : null}
-
-      <button
-        type="button"
-        id={fieldId}
-        name={name}
-        disabled={disabled}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-invalid={isInvalid || undefined}
-        aria-describedby={message ? messageId : undefined}
-        onClick={openSheet}
+    return (
+      <div
+        dir={dir}
         className={clsx(
-          'relative flex w-full items-center gap-2 overflow-visible rounded-ruk border border-solid text-sm transition-[border-color,background-color] duration-150',
-          isOutlined ? 'h-10 p-2' : 'h-12 px-2',
-          disabled
-            ? clsx(
-                'cursor-not-allowed border-ruk-field-border text-ruk-field-disabled-fg',
-                isOutlined ? 'bg-ruk-bg' : 'bg-ruk-btn-disabled',
-              )
-            : isInvalid
-              ? clsx(
-                  'cursor-pointer border-ruk-error text-black',
-                  isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
-                )
-              : clsx(
-                  'cursor-pointer',
-                  isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
-                  forceHover
-                    ? 'border-ruk-field-border-hover'
-                    : 'border-ruk-field-border hover:border-ruk-field-border-hover',
-                ),
+          'ruk-dropdown flex w-full max-w-[330px] flex-col gap-2',
+          isOutlined && 'pt-2',
+          className,
         )}
       >
-        {icon ? (
-          <span
+        {label && !hideStackedLabel ? (
+          <label
+            htmlFor={fieldId}
             className={clsx(
-              'inline-flex size-6 shrink-0 items-center justify-center',
+              'm-0 text-right text-sm font-bold leading-5',
               disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
             )}
           >
-            {icon}
-          </span>
-        ) : null}
-
-        <span
-          className={clsx(
-            'min-w-0 flex-1 truncate text-right tracking-[-0.25px]',
-            hideValueWhileLabelInside && 'opacity-0',
-            disabled
-              ? 'text-ruk-field-disabled-fg'
-              : hasValue
-                ? 'font-medium text-black'
-                : isOutlined
-                  ? 'text-black'
-                  : 'text-ruk-field-placeholder',
-          )}
-          aria-hidden={hideValueWhileLabelInside || undefined}
-        >
-          {display}
-        </span>
-
-        <span
-          className={clsx(
-            'inline-flex size-6 shrink-0 items-center justify-center',
-            disabled
-              ? 'text-ruk-field-disabled-fg'
-              : 'text-ruk-field-placeholder',
-          )}
-        >
-          <ChevronDownIcon
-            width={24}
-            height={24}
-            className={clsx('transition-transform', open && 'rotate-180')}
-          />
-        </span>
-
-        {isOutlined && label ? (
-          <span
-            className={clsx(
-              'pointer-events-none absolute z-10 text-right whitespace-nowrap transition-[top,inset-inline-start,font-size,line-height,font-weight,padding,background-color] duration-150',
-              disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
-              labelFloated
-                ? 'start-[11px] top-0 -translate-y-1/2 bg-ruk-bg px-1 text-[8px] font-bold leading-[1.4]'
-                : clsx(
-                    'top-1/2 -translate-y-1/2 truncate text-sm font-normal leading-6',
-                    icon ? 'start-10' : 'start-2',
-                    'end-10',
-                  ),
-            )}
-          >
+            {label}
             {required ? (
               <span className="ms-1 text-ruk-error" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {label}
-          </span>
+          </label>
         ) : null}
-      </button>
 
-      {/* Hidden input helps native form / RHF name registration when needed */}
-      {name ? (
-        <input
-          type="hidden"
-          name={name}
-          value={multiple ? selected.join(',') : (selected[0] ?? '')}
-          readOnly
-        />
-      ) : null}
+        <button
+          type="button"
+          id={fieldId}
+          disabled={disabled}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-invalid={isInvalid || undefined}
+          aria-describedby={message ? messageId : undefined}
+          onClick={openSheet}
+          className={clsx(
+            'relative flex w-full items-center gap-2 overflow-visible rounded-ruk border border-solid text-sm transition-[border-color,background-color] duration-150',
+            isOutlined ? 'h-10 p-2' : 'h-12 px-2',
+            disabled
+              ? clsx(
+                  'cursor-not-allowed border-ruk-field-border text-ruk-field-disabled-fg',
+                  isOutlined ? 'bg-ruk-bg' : 'bg-ruk-btn-disabled',
+                )
+              : isInvalid
+                ? clsx(
+                    'cursor-pointer border-ruk-error text-black',
+                    isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
+                  )
+                : clsx(
+                    'cursor-pointer',
+                    isOutlined ? 'bg-ruk-bg' : 'bg-ruk-field',
+                    forceHover
+                      ? 'border-ruk-field-border-hover'
+                      : 'border-ruk-field-border hover:border-ruk-field-border-hover',
+                  ),
+          )}
+        >
+          {icon ? (
+            <span
+              className={clsx(
+                'inline-flex size-6 shrink-0 items-center justify-center',
+                disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
+              )}
+            >
+              {icon}
+            </span>
+          ) : null}
 
-      {message ? (
+          <span
+            className={clsx(
+              'min-w-0 flex-1 truncate text-right tracking-[-0.25px]',
+              hideValueWhileLabelInside && 'opacity-0',
+              disabled
+                ? 'text-ruk-field-disabled-fg'
+                : hasValue
+                  ? 'font-medium text-black'
+                  : isOutlined
+                    ? 'text-black'
+                    : 'text-ruk-field-placeholder',
+            )}
+            aria-hidden={hideValueWhileLabelInside || undefined}
+          >
+            {display}
+          </span>
+
+          <span
+            className={clsx(
+              'inline-flex size-6 shrink-0 items-center justify-center',
+              disabled
+                ? 'text-ruk-field-disabled-fg'
+                : 'text-ruk-field-placeholder',
+            )}
+          >
+            <ChevronDownIcon
+              width={24}
+              height={24}
+              className={clsx('transition-transform', open && 'rotate-180')}
+            />
+          </span>
+
+          {isOutlined && label ? (
+            <span
+              className={clsx(
+                'pointer-events-none absolute z-10 text-right whitespace-nowrap transition-[top,inset-inline-start,font-size,line-height,font-weight,padding,background-color] duration-150',
+                disabled ? 'text-ruk-field-disabled-fg' : 'text-black',
+                labelFloated
+                  ? 'start-[11px] top-0 -translate-y-1/2 bg-ruk-bg px-1 text-[8px] font-bold leading-[1.4]'
+                  : clsx(
+                      'top-1/2 -translate-y-1/2 truncate text-sm font-normal leading-6',
+                      icon ? 'start-10' : 'start-2',
+                      'end-10',
+                    ),
+              )}
+            >
+              {label}
+              {required ? (
+                <span className="ms-1 text-ruk-error" aria-hidden="true">
+                  *
+                </span>
+              ) : null}
+            </span>
+          ) : null}
+        </button>
+
+        {/* Hidden input for native forms + RHF ref registration */}
+        {name || registerBinding || ref ? (
+          <input
+            type="hidden"
+            name={registerBinding?.name ?? name}
+            value={hiddenValue}
+            readOnly
+            tabIndex={-1}
+            aria-hidden="true"
+            ref={mergeRefs(ref, registerBinding?.ref)}
+          />
+        ) : null}
+
+        {/* Always reserve one line so error/helperText never shift siblings. */}
         <p
           id={messageId}
           role={isInvalid ? 'alert' : undefined}
           className={clsx(
-            'm-0 text-right text-xs font-normal leading-[1.4]',
-            isInvalid ? 'text-ruk-error' : 'text-ruk-text-muted',
+            'm-0 min-h-[1.4em] text-right text-xs font-normal leading-[1.4]',
+            message
+              ? isInvalid
+                ? 'text-ruk-error'
+                : 'text-ruk-text-muted'
+              : 'invisible',
           )}
         >
-          {message}
+          {message || '\u00A0'}
         </p>
-      ) : null}
 
-      <BottomSheet
-        open={open}
-        onClose={closeSheet}
-        title={sheetTitle ?? label} 
-        dir={dir}
-        footer={
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="filled"
-              size="medium"
-              height={48}
-              block
-              className="max-w-none flex-1"
-              disabled={draft.length === 0}
-              onClick={confirmSelection}
-            >
-              {confirmText}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="medium"
-              height={48}
-              block
-              className="max-w-none flex-1"
-              onClick={closeSheet}
-            >
-              {cancelText}
-            </Button>
-          </div>
-        }
-      >
-        <ul className="m-0 flex list-none flex-col gap-2 p-0">
-          {multiple && selectAllLabel ? (
-            <li>
-              <OptionRow
-                label={selectAllLabel}
-                selected={allSelected}
-                multiple
-                onSelect={toggleSelectAll}
-              />
-            </li>
-          ) : null}
-
-          {options.map((option) => {
-            const selectedRow = isDraftSelected(option.value)
-            return (
-              <li key={option.value}>
+        <BottomSheet
+          open={open}
+          onClose={closeSheet}
+          title={sheetTitle ?? label}
+          dir={dir}
+          footer={
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="filled"
+                size="medium"
+                height={48}
+                block
+                className="max-w-none flex-1"
+                disabled={draft.length === 0}
+                onClick={confirmSelection}
+              >
+                {confirmText}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="medium"
+                height={48}
+                block
+                className="max-w-none flex-1"
+                onClick={closeSheet}
+              >
+                {cancelText}
+              </Button>
+            </div>
+          }
+        >
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {multiple && selectAllLabel ? (
+              <li>
                 <OptionRow
-                  label={option.label}
-                  selected={selectedRow}
-                  multiple={multiple}
-                  disabled={option.disabled}
-                  onSelect={() => {
-                    if (option.disabled) return
-                    if (multiple) toggleMulti(option.value)
-                    else selectSingle(option.value)
-                  }}
+                  label={selectAllLabel}
+                  selected={allSelected}
+                  multiple
+                  onSelect={toggleSelectAll}
                 />
               </li>
-            )
-          })}
-        </ul>
-      </BottomSheet>
-    </div>
-  )
-}
+            ) : null}
+
+            {options.map((option) => {
+              const selectedRow = isDraftSelected(option.value)
+              return (
+                <li key={option.value}>
+                  <OptionRow
+                    label={option.label}
+                    selected={selectedRow}
+                    multiple={multiple}
+                    disabled={option.disabled}
+                    onSelect={() => {
+                      if (option.disabled) return
+                      if (multiple) toggleMulti(option.value)
+                      else selectSingle(option.value)
+                    }}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+        </BottomSheet>
+      </div>
+    )
+  },
+)
 
 function OptionRow({
   label,

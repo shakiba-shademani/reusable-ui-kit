@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, RefCallback } from 'react'
 
 export type DropdownOption = {
   value: string
@@ -15,6 +15,23 @@ export type DropdownVariant = 'default' | 'outlined'
  * `fixed` — label stays on the border.
  */
 export type DropdownLabelMode = 'float' | 'fixed'
+
+/**
+ * Compatible with react-hook-form `UseFormRegister` without depending on RHF.
+ * Use with `name`: `<Dropdown name="service" register={register} options={...} />`
+ * Prefer `Controller` + `field` for typed values.
+ */
+export type DropdownRegister = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  name: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  options?: any,
+) => {
+  onChange: (event: { target: { name: string; value: unknown } }) => unknown
+  onBlur: (event: { target: { name: string } }) => unknown
+  ref: RefCallback<HTMLInputElement>
+  name: string
+}
 
 type DropdownSharedProps = {
   /** Field label. Stacked above the trigger in `default`; inside/on-border in `outlined`. */
@@ -54,6 +71,14 @@ type DropdownSharedProps = {
   labelMode?: DropdownLabelMode
   /** Optional leading icon (right edge in RTL). 24×24 in Figma. */
   icon?: ReactNode
+  /**
+   * react-hook-form `register` function. Use with `name`:
+   * `<Dropdown name="service" register={register} options={...} />`
+   * Or use `Controller` and spread `field` (`value` / `onChange` / `onBlur` / `ref`).
+   */
+  register?: DropdownRegister
+  /** Called when the sheet closes (confirm or cancel) — for RHF `field.onBlur`. */
+  onBlur?: () => void
 }
 
 export type DropdownSingleProps = DropdownSharedProps & {

@@ -198,6 +198,18 @@ export const OnlyNumber: Story = {
   },
 }
 
+export const TextAlignCenter: Story = {
+  name: 'Text align · center',
+  args: {
+    label: 'شماره همراه',
+    placeholder: '۰۹۱۲۳۴۵۶۷۸۹',
+    onlyNumber: true,
+    textAlign: 'center',
+    width: '100%',
+    required: true,
+  },
+}
+
 export const Amount: Story = {
   args: {
     label: 'مبلغ',
@@ -227,20 +239,26 @@ export const CardNumber: Story = {
 
 export const ReactHookFormCompatible: Story = {
   name: 'react-hook-form compatible',
-  render: () => {
-    // Demonstrates native ref + name + onChange + onBlur surface.
-    // In an app: <Input {...register('phone')} onlyNumber />
-    // or <Controller render={({ field }) => <Input {...field} amount />} />
-    return (
+  render: () => (
+    <div className="flex w-full max-w-md flex-col gap-4">
       <Input
-        name="phone"
-        label="شماره موبایل"
+        name="mobile"
+        label="شماره همراه (register prop)"
         placeholder="۰۹۱۲..."
         onlyNumber
-        helperText="ارقام فارسی و انگلیسی هر دو پذیرفته می‌شوند"
+        width="100%"
+        helperText="در اپ: register={register} — همان الگوی design-system قبلی"
       />
-    )
-  },
+      <Input
+        name="mobile"
+        label="شماره همراه (spread register)"
+        placeholder="۰۹۱۲..."
+        onlyNumber
+        width="100%"
+        helperText="در اپ: {...register('mobile')} onlyNumber"
+      />
+    </div>
+  ),
 }
 
 /** Full Figma matrix: 4 variants × 5 states */

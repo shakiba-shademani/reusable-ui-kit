@@ -299,3 +299,28 @@ export const OutlinedModes: Story = {
     </div>
   ),
 }
+
+export const ReactHookFormCompatible: Story = {
+  name: 'react-hook-form compatible',
+  render: () => (
+    <div className="flex max-w-[360px] flex-col gap-6" dir="rtl">
+      <Dropdown
+        name="service"
+        label="خدمت (register prop)"
+        sheetTitle="خدمت"
+        options={SERVICE_OPTIONS}
+        helperText="در اپ: register={register} name=&quot;service&quot;"
+      />
+      <Dropdown
+        name="serviceCtrl"
+        label="خدمت (Controller field)"
+        sheetTitle="خدمت"
+        options={SERVICE_OPTIONS}
+        value=""
+        onChange={() => undefined}
+        onBlur={() => undefined}
+        helperText="در اپ: value/onChange/onBlur/ref از field"
+      />
+    </div>
+  ),
+}
