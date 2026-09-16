@@ -105,14 +105,30 @@ const COMPONENTS = {
       },
       {
         name: 'dir',
-        type: "'rtl' | 'ltr'",
+        type: "'rtl' | 'ltr' | 'auto'",
         description: 'Defaults to rtl.',
+      },
+      {
+        name: 'width',
+        type: 'string | number',
+        description: "Wrapper width, e.g. '100%' or '330px'.",
+      },
+      {
+        name: 'textAlign',
+        type: "'left' | 'center' | 'right'",
+        description: 'Value/placeholder alignment. Default right (RTL/Figma). Use center for login-style fields.',
+      },
+      {
+        name: 'register',
+        type: 'UseFormRegister (from your app)',
+        description:
+          'Pass react-hook-form register with name: register={register} name="mobile".',
       },
       {
         name: '...rest',
         type: 'InputHTMLAttributes',
         description:
-          'Native input attrs for RHF: value, onChange, onBlur, name, ref (via forwardRef).',
+          'Or spread register: {...register("mobile")}. Ref is merged with forwardRef.',
       },
     ],
     examples: [
@@ -129,8 +145,19 @@ const COMPONENTS = {
 />`,
       },
       {
-        title: 'react-hook-form register',
-        code: `<Input label="موبایل" onlyNumber {...register('phone')} />`,
+        title: 'react-hook-form register (spread)',
+        code: `<Input label="موبایل" onlyNumber width="100%" {...register('phone')} />`,
+      },
+      {
+        title: 'react-hook-form register (prop)',
+        code: `<Input
+  name="mobile"
+  label="شماره همراه"
+  onlyNumber
+  width="100%"
+  register={register}
+  error={errors.mobile?.message}
+/>`,
       },
       {
         title: 'react-hook-form Controller',
@@ -145,6 +172,35 @@ const COMPONENTS = {
       {
         title: 'Persian digits',
         code: `<Input label="کد" onlyNumber placeholder="۱۲۳۴" />`,
+      },
+      {
+        title: 'react-hook-form Controller',
+        code: `<Controller
+  name="service"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Dropdown
+      label="خدمت"
+      options={options}
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      name={field.name}
+      ref={field.ref}
+      error={fieldState.error?.message}
+    />
+  )}
+/>`,
+      },
+      {
+        title: 'react-hook-form register prop',
+        code: `<Dropdown
+  name="service"
+  register={register}
+  label="خدمت"
+  options={options}
+  error={errors.service?.message}
+/>`,
       },
       {
         title: 'Outlined float',
@@ -285,7 +341,8 @@ const COMPONENTS = {
     props: [
       { name: 'options', type: 'DropdownOption[]', description: '{ value, label, disabled? }[]' },
       { name: 'multiple', type: 'boolean', description: 'Multi-select with footer actions.' },
-      { name: 'value / onChange', type: 'string | string[]', description: 'Controlled form value.' },
+      { name: 'value / onChange / onBlur / ref', type: 'controlled + RHF field', description: 'Use with Controller: value, onChange, onBlur, name, ref.' },
+      { name: 'register', type: 'UseFormRegister (from your app)', description: 'With name: register={register} name="service" (legacy Select style).' },
       { name: 'label / placeholder / sheetTitle', type: 'string', description: 'Field + sheet copy.' },
       { name: 'variant', type: "'default' | 'outlined'", description: 'Stacked label vs floating/border label.' },
       { name: 'labelMode', type: "'float' | 'fixed'", description: 'Outlined only. float = label inside until click/value; fixed = always on the border.' },
@@ -317,6 +374,35 @@ const COMPONENTS = {
   onChange={setValues}
   confirmText="تایید"
   cancelText="انصراف"
+/>`,
+      },
+      {
+        title: 'react-hook-form Controller',
+        code: `<Controller
+  name="service"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Dropdown
+      label="خدمت"
+      options={options}
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      name={field.name}
+      ref={field.ref}
+      error={fieldState.error?.message}
+    />
+  )}
+/>`,
+      },
+      {
+        title: 'react-hook-form register prop',
+        code: `<Dropdown
+  name="service"
+  register={register}
+  label="خدمت"
+  options={options}
+  error={errors.service?.message}
 />`,
       },
       {

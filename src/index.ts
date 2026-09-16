@@ -2,6 +2,8 @@ export { Input } from './components/input'
 export type {
   InputLabelMode,
   InputProps,
+  InputRegister,
+  InputTextAlign,
   InputVariant,
 } from './components/input'
 
@@ -22,6 +24,7 @@ export type {
   DropdownMultipleProps,
   DropdownOption,
   DropdownProps,
+  DropdownRegister,
   DropdownSingleProps,
   DropdownVariant,
 } from './components/dropdown'
