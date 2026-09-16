@@ -4,6 +4,7 @@ export type {
   DropdownMultipleProps,
   DropdownOption,
   DropdownProps,
+  DropdownRegister,
   DropdownSingleProps,
   DropdownVariant,
 } from './dropdown.types'
