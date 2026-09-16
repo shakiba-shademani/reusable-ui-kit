@@ -86,10 +86,12 @@ RTL: label, value, placeholder, and error are right-aligned; icon sits on the ri
 
 ### Behaviour
 
-- Works with **react-hook-form** via native `ref` / `name` / `value` / `onChange` / `onBlur`
-  (`{...register('field')}` or `<Controller render={({ field }) => <Input {...field} />} />`).
+- Works with **react-hook-form** in consuming apps (no RHF dependency here):
+  `{...register('mobile')}`, or `register={register}` + `name` (legacy DS style), or `Controller` + `field`.
+  Refs from `register` are merged with `forwardRef`. Formatted values are written to the event before RHF runs.
 - Persian and Arabic digits are normalized to English (`۰` → `0`).
 - Optional modes: `onlyNumber`, `amount` (thousand separators), `cardNo`, `persianLetter`, `helperText`.
+- `textAlign`: `'left' | 'center' | 'right'` (default `'right'`; use `textAlign="center"` on auth forms).
 
 ```tsx
 import { useForm, Controller } from 'react-hook-form'
@@ -97,7 +99,16 @@ import { Input } from 'reusable-ui-kit'
 
 const { register, control } = useForm()
 
-<Input label="موبایل" onlyNumber {...register('phone')} />
+<Input label="موبایل" onlyNumber width="100%" {...register('phone')} />
+
+<Input
+  name="mobile"
+  label="شماره همراه"
+  onlyNumber
+  width="100%"
+  register={register}
+  error={errors.mobile?.message}
+/>
 
 <Controller
   name="amount"
@@ -145,7 +156,44 @@ import { Button, WalletIcon } from 'reusable-ui-kit'
 - **Variants:** `default` (label above) · `outlined` (label inside or on the border)  
 - **Outlined label:** `labelMode="float"` starts inside and rises to the border on click/value; `labelMode="fixed"` stays on the border  
 - Optional `icon` (24×24, right edge in RTL)  
-- Form-friendly: `value` / `onChange` / `error` (works with `Controller`)
+- Form-friendly (no RHF dependency in the kit):
+  - **`Controller` (recommended):** spread `field` — `value` / `onChange` / `onBlur` / `ref` / `name`
+  - **`register` prop (legacy Select style):** `name="service" register={register}`
+
+```tsx
+import { useForm, Controller } from 'react-hook-form'
+import { Dropdown, ReceiptIcon } from 'reusable-ui-kit'
+
+const { register, control, formState: { errors } } = useForm()
+
+// Controller
+<Controller
+  name="service"
+  control={control}
+  rules={{ required: 'انتخاب کنید' }}
+  render={({ field, fieldState }) => (
+    <Dropdown
+      label="خدمت"
+      options={options}
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      name={field.name}
+      ref={field.ref}
+      error={fieldState.error?.message}
+    />
+  )}
+/>
+
+// register prop (same idea as the previous design-system Select)
+<Dropdown
+  name="service"
+  register={register}
+  label="خدمت"
+  options={options}
+  error={errors.service?.message}
+/>
+```
 
 ```tsx
 import { Dropdown, ReceiptIcon } from 'reusable-ui-kit'
