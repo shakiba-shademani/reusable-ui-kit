@@ -45,6 +45,51 @@ export type { SliderItem, SliderProps } from './components/slider'
 export { OtpInput } from './components/otp-input'
 export type { OtpInputProps } from './components/otp-input'
 
+export { Badge } from './components/badge'
+export type { BadgeProps, BadgeRegister } from './components/badge'
+
+export { Checkbox } from './components/checkbox'
+export type { CheckboxProps, CheckboxRegister } from './components/checkbox'
+
+export { RadioGroup } from './components/radio-group'
+export type { RadioGroupProps, RadioOption } from './components/radio-group'
+
+export { Counter } from './components/counter'
+export type { CounterProps } from './components/counter'
+
+export { KeyValue } from './components/key-value'
+export type { KeyValueItem, KeyValueProps } from './components/key-value'
+
+export { Loading } from './components/loading'
+export type { LoadingProps, LoadingType } from './components/loading'
+
+export { Marquee } from './components/marquee'
+export type { MarqueeProps } from './components/marquee'
+
+export { Switch } from './components/switch'
+export type { SwitchProps } from './components/switch'
+
+export { Accordion } from './components/accordion'
+export type { AccordionProps } from './components/accordion'
+
+export { Select } from './components/select'
+export type {
+  SelectMultipleProps,
+  SelectOption,
+  SelectProps,
+  SelectRegister,
+  SelectSingleProps,
+} from './components/select'
+
+export { VistaChart } from './components/vista-chart'
+export type { VistaChartItem, VistaChartProps } from './components/vista-chart'
+
+export { Wizard } from './components/wizard'
+export type { WizardProps } from './components/wizard'
+
+export { ToastCard } from './components/toast-card'
+export type { ToastCardProps, ToastCardVariant } from './components/toast-card'
+
 export {
   DatePicker,
   DateObject,
@@ -68,6 +113,7 @@ export { CheckIcon } from './icons/check-icon'
 export type { CheckIconProps } from './icons/check-icon'
 
 export { toEnglishDigits } from './utils/to-english-digits'
+export { toPersianDigits } from './utils/to-persian-digits'
 export { toPersianLetter } from './utils/to-persian-letter'
 export {
   digitsOnly,

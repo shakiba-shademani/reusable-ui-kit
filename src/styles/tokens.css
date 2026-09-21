@@ -39,6 +39,29 @@
   /* Tab track (Figma 13390:74672) */
   --color-ruk-tab-track: #f3f3f3;
 
+  /* Badge / filter chip (Figma Pulse filters) */
+  --color-ruk-badge-border: #ededed;
+  --color-ruk-badge-text: #4b4b4b;
+  --color-ruk-badge-selected: #cb0000;
+  --color-ruk-badge-selected-bg: #fdecec;
+
+  /* Toast card */
+  --color-ruk-toast-warning: #f9f4d8;
+  --color-ruk-toast-success: #d5ecde;
+  --color-ruk-toast-error: #fdecec;
+  --color-ruk-toast-info: #e5ecff;
+
+  --animate-ruk-marquee: ruk-marquee 10s linear infinite;
+
+  @keyframes ruk-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
   --radius-ruk: 0.5rem;
   --radius-ruk-sheet: 1rem;
   --radius-ruk-nav: 15px;
