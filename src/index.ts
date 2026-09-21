@@ -45,6 +45,17 @@ export type { SliderItem, SliderProps } from './components/slider'
 export { OtpInput } from './components/otp-input'
 export type { OtpInputProps } from './components/otp-input'
 
+export {
+  DatePicker,
+  DateObject,
+  datesToFormValue,
+  formValueToDates,
+  fromJalaliParam,
+  JALALI_DATE_PARAM_FORMAT,
+  toJalaliParam,
+} from './components/date-picker'
+export type { DatePickerProps, DatePickerRegister } from './components/date-picker'
+
 export { WalletIcon } from './icons/wallet-icon'
 export type { WalletIconProps } from './icons/wallet-icon'
 export { ReceiptIcon } from './icons/receipt-icon'

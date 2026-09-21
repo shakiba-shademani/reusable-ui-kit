@@ -1,0 +1,128 @@
+/* Exact styles ported from beat PersianDateRangePicker */
+.ruk-date-picker-calendar {
+  width: 100% !important;
+  max-width: 320px !important;
+  direction: rtl !important;
+  border: none !important;
+}
+
+.ruk-date-picker-calendar .rmdp-wrapper {
+  width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+.ruk-date-picker-calendar .rmdp-header {
+  display: none !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day-picker {
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+.ruk-date-picker-calendar .rmdp-week {
+  gap: 0 !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day:not(.rmdp-disabled, .rmdp-day-hidden) {
+  cursor: pointer !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-disabled {
+  cursor: not-allowed !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-disabled span {
+  opacity: 0.35 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+.ruk-date-picker-calendar .rmdp-week-day {
+  color: #6b7280 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  width: 40px !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-today span {
+  background-color: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range-hover {
+  background-color: #e5ecff !important;
+  box-shadow: none !important;
+  color: #323232 !important;
+  border-radius: 0 !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range span,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range-hover span {
+  background-color: transparent !important;
+  color: #323232 !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
+}
+
+/* In RTL the range grows leftwards, so the edge days keep their outer side rounded. */
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.start,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range-hover.start {
+  background-color: #004693 !important;
+  border-top-right-radius: 50% !important;
+  border-bottom-right-radius: 50% !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.end,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range-hover.end {
+  background-color: #004693 !important;
+  border-top-left-radius: 50% !important;
+  border-bottom-left-radius: 50% !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.start.end,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range:has(span.ruk-date-picker-single) {
+  background-color: #004693 !important;
+  border-radius: 50% !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.start span,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.end span,
+.ruk-date-picker-calendar .rmdp-day.rmdp-selected span,
+.ruk-date-picker-calendar .rmdp-day span.ruk-date-picker-single {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day:not(.rmdp-disabled, .rmdp-day-hidden) span:hover {
+  background-color: #e5ecff !important;
+  color: #323232 !important;
+}
+
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.start span:hover,
+.ruk-date-picker-calendar .rmdp-day.rmdp-range.end span:hover,
+.ruk-date-picker-calendar .rmdp-day span.ruk-date-picker-single:hover {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.ruk-date-picker-calendar.ruk-date-picker-single-mode .rmdp-day.rmdp-selected span,
+.ruk-date-picker-calendar.ruk-date-picker-single-mode .rmdp-day.rmdp-selected span:hover {
+  background-color: #004693 !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
