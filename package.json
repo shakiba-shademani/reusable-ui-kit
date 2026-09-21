@@ -29,6 +29,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "start": "node static-server.js",
     "mcp": "node mcp/server.mjs",
     "prepack": "node --input-type=module -e \"import { mkdirSync } from 'node:fs'; mkdirSync('archive', { recursive: true })\"",
     "prepublishOnly": "npm run build"
@@ -41,7 +42,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "clsx": "^2.1.1",
-    "swiper": "^14.2.0",
+    "swiper": ">=11",
     "zod": "^4.6.5"
   },
   "devDependencies": {
