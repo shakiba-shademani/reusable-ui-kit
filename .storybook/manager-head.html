@@ -1,0 +1,19 @@
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  html.sb-auth-pending body {
+    visibility: hidden !important;
+  }
+</style>
+<script>
+  document.documentElement.classList.add('sb-auth-pending')
+  try {
+    if (sessionStorage.getItem('reusable-ui-kit-sb-auth') === 'ok') {
+      document.documentElement.classList.remove('sb-auth-pending')
+    }
+  } catch (e) {}
+</script>
