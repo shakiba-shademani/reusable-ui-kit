@@ -8,4 +8,6 @@ RUN npm install --legacy-peer-deps --verbose
 
 RUN npm run build-storybook
 
-CMD node init.js && npm run start
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
