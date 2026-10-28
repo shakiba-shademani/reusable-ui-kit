@@ -7,7 +7,7 @@ Publishable to npm, with an MCP server so other Cursor projects can learn how to
 ## Quick start
 
 ```bash
-cd F:/pulse-pwa-sadad/cursor-ui-kit
+cd path/to/your-project
 npm install
 npm run storybook
 ```
@@ -50,7 +50,7 @@ Point Cursor MCP config at this repo so agents in other projects can query compo
   "mcpServers": {
     "reusable-ui-kit": {
       "command": "node",
-      "args": ["F:/pulse-pwa-sadad/cursor-ui-kit/mcp/server.mjs"]
+      "args": ["path/to/your-project/mcp/server.mjs"]
     }
   }
 }
