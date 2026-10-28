@@ -10,7 +10,7 @@
  *   "mcpServers": {
  *     "reusable-ui-kit": {
  *       "command": "node",
- *       "args": ["F:/pulse-pwa-sadad/cursor-ui-kit/mcp/server.mjs"]
+ *       "args": ["path/to/your-project/mcp/server.mjs"]
  *     }
  *   }
  * }
@@ -631,7 +631,7 @@ import 'reusable-ui-kit/styles.css'
 
 ## Local Storybook
 \`\`\`bash
-cd F:/pulse-pwa-sadad/cursor-ui-kit
+cd path/to/your-project
 npm run storybook
 \`\`\`
 

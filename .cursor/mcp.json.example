@@ -2,7 +2,7 @@
   "mcpServers": {
     "reusable-ui-kit": {
       "command": "node",
-      "args": ["F:/pulse-pwa-sadad/cursor-ui-kit/mcp/server.mjs"]
+      "args": ["path/to/your-project/mcp/server.mjs"]
     }
   }
 }
